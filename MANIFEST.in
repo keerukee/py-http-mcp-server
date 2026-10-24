@@ -1,0 +1,5 @@
+# Extra files for the source distribution (the wheel only contains the package itself)
+include LICENSE README.md CHANGELOG.md
+recursive-include tests *.py
+recursive-include examples *.py *.html *.css *.js
+global-exclude __pycache__ *.py[cod]

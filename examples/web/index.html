@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample MCP Server · Web + MCP</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <h1 id="server-title">MCP Server</h1>
+        <small id="server-version">Web app + MCP server on one port</small>
+      </div>
+    </div>
+    <div class="endpoint">
+      <span class="label">MCP endpoint</span>
+      <span id="mcp-url">/mcp</span>
+      <button class="btn small ghost" data-copy-target="mcp-url" title="Copy">Copy</button>
+    </div>
+    <div class="stats">
+      <span class="chip">Tools <b id="stat-tools">–</b></span>
+      <span class="chip">Notes <b id="stat-notes">–</b></span>
+      <span class="chip" title="MCP clients holding a GET stream">MCP streams <b id="stat-streams">–</b></span>
+      <span class="chip" title="Browser tabs subscribed to live updates">Browsers <b id="stat-browsers">–</b></span>
+    </div>
+    <div class="live" title="Live updates (Server-Sent Events)"><span class="dot" id="live-dot"></span><span id="live-text">Connecting…</span></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-view="notes">Notes board<span class="count" id="tab-notes-count">0</span></button>
+    <button class="tab" data-view="playground">MCP playground</button>
+    <button class="tab" data-view="activity">Activity<span class="count" id="tab-activity-count">0</span></button>
+    <button class="tab" data-view="connect">Connect a client</button>
+  </nav>
+
+  <main>
+    <!-- ================= NOTES ================= -->
+    <section class="view active" id="view-notes">
+      <div class="grid-2">
+        <form class="panel" id="note-form" autocomplete="off">
+          <h2>New note</h2>
+          <p class="muted" style="margin-top:-6px">Saved through the REST API. AI agents see it instantly via the <code>list_notes</code> tool and the <code>notes://all</code> resource.</p>
+          <label for="note-title">Title</label>
+          <input type="text" id="note-title" placeholder="e.g. Review pull request #42" required maxlength="200">
+          <label for="note-body">Details</label>
+          <textarea id="note-body" placeholder="Optional details"></textarea>
+          <label for="note-tags">Tags (comma separated)</label>
+          <input type="text" id="note-tags" placeholder="work, urgent">
+          <div class="row" style="margin-top:14px">
+            <button class="btn primary" type="submit">Add note</button>
+            <span class="muted" style="font-size:12px">Ctrl+Enter</span>
+          </div>
+        </form>
+
+        <div>
+          <div class="toolbar">
+            <input type="text" id="note-search" placeholder="Search notes…">
+            <label class="toggle"><input type="checkbox" id="show-done" checked> Show completed</label>
+            <span id="tag-filter" class="row"></span>
+            <span class="spacer"></span>
+            <span class="muted" style="font-size:12px"><span class="badge web">WEB</span> created in browser &nbsp; <span class="badge mcp">MCP</span> created by an AI agent</span>
+          </div>
+          <div class="notes" id="notes"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PLAYGROUND ================= -->
+    <section class="view" id="view-playground">
+      <div class="row" style="margin-bottom:6px">
+        <div class="seg" id="pg-seg">
+          <button class="active" data-kind="tools">Tools</button>
+          <button data-kind="resources">Resources</button>
+          <button data-kind="prompts">Prompts</button>
+        </div>
+        <span class="spacer"></span>
+        <span class="session" id="pg-session">Not initialized</span>
+        <button class="btn small" id="pg-reconnect">Re-initialize</button>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <h2 id="pg-list-title">Tools</h2>
+          <div class="list" id="pg-list"></div>
+        </div>
+        <div class="panel" id="pg-detail">
+          <p class="muted">The browser talks to <code>/mcp</code> over Streamable HTTP, the same JSON-RPC protocol MCP Inspector and Antigravity use. Pick an item on the left.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ACTIVITY ================= -->
+    <section class="view" id="view-activity">
+      <div class="row" style="margin-bottom:14px">
+        <p class="muted" style="margin:0">Every change to the notes board, from the browser or from MCP clients, streamed live over Server-Sent Events.</p>
+        <span class="spacer"></span>
+        <button class="btn small" id="clear-activity">Clear view</button>
+      </div>
+      <div class="feed" id="feed"></div>
+    </section>
+
+    <!-- ================= CONNECT ================= -->
+    <section class="view" id="view-connect">
+      <div class="cards">
+        <div class="panel">
+          <h2>Antigravity IDE</h2>
+          <p class="muted">Add this entry to <code>~/.gemini/config/mcp_config.json</code>, then reload MCP servers.</p>
+          <div class="code-wrap"><pre class="json" id="cfg-antigravity"></pre><button class="btn small" data-copy-target="cfg-antigravity">Copy</button></div>
+          <p class="muted">Then try asking the agent: <i>"Add a note to review the release checklist, tagged work"</i>, and watch it appear on the Notes board.</p>
+        </div>
+        <div class="panel">
+          <h2>MCP Inspector</h2>
+          <ol>
+            <li>Run <code>npx @modelcontextprotocol/inspector</code></li>
+            <li>Transport type: <b>Streamable HTTP</b></li>
+            <li>URL: <code id="inspector-url"></code></li>
+            <li>Click <b>Connect</b>, open <b>Tools</b>, and run <code>add_note</code></li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h2>Claude Code / Cursor</h2>
+          <div class="code-wrap"><pre class="json" id="cfg-claude"></pre><button class="btn small" data-copy-target="cfg-claude">Copy</button></div>
+        </div>
+        <div class="panel">
+          <h2>curl</h2>
+          <div class="code-wrap"><pre class="json" id="cfg-curl"></pre><button class="btn small" data-copy-target="cfg-curl">Copy</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toasts" id="toasts"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

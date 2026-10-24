@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py-http-mcp-server"
+dynamic = ["version"]
+description = "Zero-dependency Model Context Protocol (MCP) server library over Streamable HTTP. Plugs into FastAPI, Flask, Django or runs standalone."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Keerthi RB", email = "keerukee@gmail.com" }]
+dependencies = []  # standard library only
+keywords = ["mcp", "model-context-protocol", "llm", "ai", "agents", "streamable-http", "json-rpc", "fastapi", "flask", "django"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Framework :: FastAPI",
+    "Framework :: Flask",
+    "Framework :: Django",
+    "Framework :: AsyncIO",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Middleware",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/keerukee/py-http-mcp-server"
+Source = "https://github.com/keerukee/py-http-mcp-server"
+Issues = "https://github.com/keerukee/py-http-mcp-server/issues"
+Changelog = "https://github.com/keerukee/py-http-mcp-server/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = { attr = "py_http_mcp_server._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+py_http_mcp_server = ["py.typed"]
